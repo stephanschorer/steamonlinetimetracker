@@ -3,9 +3,7 @@ This tool will track your Steam Online time (the time not playing any games) on 
 
 ![Screenshot 2023-06-26 214647](https://github.com/stephanschorer/steamonlinetracker/assets/63855548/f6416fac-93ba-43ea-b252-434d5b67ac1d)
 
-## Instructions
-
-### ASF instance
+## ASF instance
 First you will need to setup an ASF instance on your local pc:  
 https://github.com/JustArchiNET/ArchiSteamFarm
 
@@ -27,7 +25,7 @@ example config bot.json
 ❗Note you will need to run each bat files at least once with admin privileges.  
 ❗Keep in mind you will need to adjust the files to your local environment  
 
-You will need to adjust the following variables
+You will need to adjust the following variables inside the *runASF.bat* file
 - pcname
 - username
 - task names (if you dont use SteamIdler, SteamIdlerExit)
@@ -35,7 +33,11 @@ You will need to adjust the following variables
 
 Afterwards you can try to run both files (with admin privileges)
 
-### Windows Hacking
+If everything works, you should be prompted to enter the credetials for the choosen user (only one time required).  
+You should see that the ASF console starts in the background.  
+And if you execute *exitASF.bat* with admin privileges the ASF console should close.
+
+## Windows Hacking
 Now that you can manually start and stop the tracking of the Online Time, you probably want to automate this.  
 This is done with Windows Task Scheduler.
 
@@ -43,7 +45,7 @@ You will need two tasks.
 - One that starts the process in the background (we will name it **SteamIdler**)
 - One that stops the process if you exit Steam (we will name it **SteamIdlerExit**)
 
-But before you can create the task, you will need to enable the logging for application starts/stops:
+But before you can create the tasks, you will need to enable the logging for application starts/stops:
 1. Start and enter secpol.msc into the Run box
 2. Navigate to Local Policies/Audit Policy
 3. Double Click Audit process tracking and enable Success
@@ -87,3 +89,8 @@ All steps are the same except the Query in Step 5:
 
 and the script in Step 8:  
 --> *exitASF.bat*
+
+## Finished
+
+Now everytime you start Steam the ASF process will be started automatically in the background.
+And if you exit Steam completely the ASF process will be stopped.
