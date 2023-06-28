@@ -41,9 +41,10 @@ And if you execute *exitASF.bat* with admin privileges the ASF console should cl
 Now that you can manually start and stop the tracking of the Online Time, you probably want to automate this.  
 This is done with Windows Task Scheduler.
 
-You will need two tasks.
+You will need three tasks.
 - One that starts the process in the background (we will name it **SteamIdler**)
 - One that stops the process if you exit Steam (we will name it **SteamIdlerExit**)
+- And one that re-enables the start process if you do not exit Steam before shutting down your pc
 
 But before you can create the tasks, you will need to enable the logging for application starts/stops:
 1. Start and enter secpol.msc into the Run box
@@ -89,6 +90,13 @@ All steps are the same except the Query in Step 5:
 
 and the script in Step 8:  
 --> *exitASF.bat*
+
+The last Task is really simple:
+1. On the "General" Tab, give the task a name (**SteamIdlerEnableOnStart**)
+2. On the "Triggers" tab, create a new trigger, and choose "on login" for your specific user
+3. Click "OK"
+4. On the "Action" tab create new action "run programm"
+5. Browse to the path and select *exitASF.bat*
 
 ## Finished
 
