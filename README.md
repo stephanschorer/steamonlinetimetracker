@@ -44,7 +44,7 @@ This is done with Windows Task Scheduler.
 You will need three tasks.
 - One that starts the process in the background (we will name it **SteamIdler**)
 - One that stops the process if you exit Steam (we will name it **SteamIdlerExit**)
-- And one that re-enables the start process if you do not exit Steam before shutting down your pc
+- And one that re-enables the start process if you did not exit Steam before shutting down your pc (we will name it **SteamIdlerTaskEnableOnStart**)
 
 But before you can create the tasks, you will need to enable the logging for application starts/stops:
 1. Start and enter secpol.msc into the Run box
@@ -92,7 +92,7 @@ and the script in Step 8:
 --> *exitASF.bat*
 
 The last Task is really simple:
-1. On the "General" Tab, give the task a name (**SteamIdlerEnableOnStart**)
+1. On the "General" Tab, give the task a name (**SteamIdlerTaskEnableOnStart**)
 2. On the "Triggers" tab, create a new trigger, and choose "on login" for your specific user
 3. Click "OK"
 4. On the "Action" tab create new action "run programm"
