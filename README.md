@@ -69,7 +69,7 @@ Now that you can manually start and stop the tracking of the Online Time, you pr
 This is done with Windows Task Scheduler.
 
 You will need four tasks:
-- **SteamIdler_1**: Disables the listening for steam.exe executions events and runs the task which will start the ASF instance as the desired user
+- **SteamIdler_1**: Disables the listening for steam.exe execution events and runs the task which will start the ASF instance as the desired user
 - **SteamIdler_2**: Runs the ArchiSteamFarm process minimized in background as your local user
 - **SteamIdlerExit**: Enables the SteamIdler_1 task again and stops the ArchiSteamFarm process if you exit out of Steam
 - **SteamIdlerEnableOnStart**: Enables the SteamIdler_1 task after a restart (in case you did not close Steam before shutting down your pc)
