@@ -103,11 +103,11 @@ Now start the Task Scheduler (taskschd.msc) and create the four tasks:
   </Query>
 </QueryList>
 ```
-7. Click "OK" two times
-8. On the "Action" tab create new action "run programm"
-9. Browse to the path and select *SteamIdler_1.bat*
-10. Click "OK" two times
-11. You may need to enter your Windows password
+8. Click "OK" two times
+9. 8. On the "Action" tab create new action "run programm"
+10. Browse to the path and select *SteamIdler_1.bat*
+11. Click "OK" two times
+12. You may need to enter your Windows password
 
 #### SteamIdler_2
 1. Right click, create new task
@@ -135,11 +135,11 @@ Now start the Task Scheduler (taskschd.msc) and create the four tasks:
   </Query>
 </QueryList>
 ```
-7. Click "OK" two times
-8. On the "Action" tab create new action "run programm"
-9. Browse to the path and select *SteamIdlerExit.bat*
-10. Click "OK" two times
-11. You may need to enter your Windows password
+8. Click "OK" two times
+9. 8. On the "Action" tab create new action "run programm"
+10. Browse to the path and select *SteamIdlerExit.bat*
+11. Click "OK" two times
+12. You may need to enter your Windows password
 
 #### SteamIdlerEnableOnStart
 1. Right click, create new task
