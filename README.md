@@ -153,7 +153,7 @@ Now start the Task Scheduler (taskschd.msc) and create the four tasks:
 9. You may need to enter your Windows password
 
 ## Finished
-Now everytime you start Steam the ASF process will be started automatically in the background.
+Now everytime you start Steam the ASF process will be started automatically in the background.   
 If you exit Steam, the ASF process will be stopped.
 
 ## Uninstallation
