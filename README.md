@@ -3,10 +3,13 @@ This tool will track your Steam Online time (the time not playing any games) on 
 
 ![Screenshot 2023-06-26 214647](https://github.com/stephanschorer/steamonlinetracker/assets/63855548/f6416fac-93ba-43ea-b252-434d5b67ac1d)
 
-## ASF instance
-First you will need to setup an ASF instance on your local pc:  
-https://github.com/JustArchiNET/ArchiSteamFarm
+## Step 1: ASF instance
+First you will need to setup an ASF instance on your local pc.    
 
+A good starting point will be the getting started wiki page:    
+https://github.com/JustArchiNET/ArchiSteamFarm/wiki/Setting-up
+
+Keep in mind, you will need to adjust the bot config file, that the bot will "farm" the Steam App:    
 example config bot.json
 ```
 {
@@ -21,43 +24,74 @@ example config bot.json
 }
 ```
 
-## Test script files
-❗Note you will need to run each bat files at least once with admin privileges.  
+## Step 2: Download Batch files
+Download the following [files](https://github.com/stephanschorer/steamonlinetimetracker/tree/main/batch%20files) and save them into your destination folder:
+- SteamIdler_1.bat
+- SteamIdler_2.bat
+- SteamIdlerExit.bat 
+
+## Step 3: Adjust and test batch files
 ❗Keep in mind you will need to adjust the files to your local environment  
+❗If you keep the schedule task names, you only need to change the *SteamIdler_2.bat* file
 
-You will need to adjust the following variables inside the *runASF.bat* file
-- pcname
-- username
-- task names (if you dont use SteamIdler, SteamIdlerExit)
-- path to ArchiSteamFarm.exe
+### SteamIdler_1.bat
+If you want to change the task names, you will need to change them in all the files.
+```
+::Stops the Task "SteamIdler" that the task is only run once
+schtasks.exe /change /tn "SteamIdler_1" /disable
 
-Afterwards you can try to run both files (with admin privileges)
+::Start ASF Run-Task
+schtasks.exe /run /tn "SteamIdler_2"
+```
 
-If everything works, you should be prompted to enter the credetials for the choosen user (only one time required).  
-You should see that the ASF console starts in the background.  
-And if you execute *exitASF.bat* with admin privileges the ASF console should close.
+### SteamIdler_2.bat
+Change the path to your ArchiSteamFarm.exe
+```
+::Start ASF as your local user
+cmd /c start /min C:\Path\To\ArchiSteamFarm.exe
+```
 
-## Windows Hacking
+### SteamIdlerExit.bat
+If you want to change the task names, you will need to change them in all the files.    
+You don't need to adjust the ArchiSteamFarm.exe in this file, because with the taskkill the process itself will be killed - therefore no path declaration is required.
+```
+::Starts the Task "SteamIdler" again for "listening" to the start events on steam.exe
+schtasks.exe /change /tn "SteamIdler_1" /enable
+
+::Stops ASF process
+taskkill /F /IM ArchiSteamFarm.exe
+```
+
+Afterwards you can try to run the *SteamIdler_2.bat* file, this should start your ASF instance.
+
+## Step 4: Windows Hacking
 Now that you can manually start and stop the tracking of the Online Time, you probably want to automate this.  
 This is done with Windows Task Scheduler.
 
-You will need three tasks.
-- One that starts the process in the background (we will name it **SteamIdler**)
-- One that stops the process if you exit Steam (we will name it **SteamIdlerExit**)
-- And one that re-enables the start process if you did not exit Steam before shutting down your pc (we will name it **SteamIdlerTaskEnableOnStart**)
+You will need four tasks:
+- **SteamIdler_1**: Disables the listening for steam.exe executions events and runs the task which will start the ASF instance as the desired user
+- **SteamIdler_2**: Runs the ArchiSteamFarm process minimized in background as your local user
+- **SteamIdlerExit**: Enables the SteamIdler_1 task again and stops the ArchiSteamFarm process if you exit out of Steam
+- **SteamIdlerEnableOnStart**: Enables the SteamIdler_1 task after a restart (in case you did not close Steam before shutting down your pc)
 
-But before you can create the tasks, you will need to enable the logging for application starts/stops:
-1. Start and enter secpol.msc into the Run box
+### Enable Logging for application events    
+Before you can create the tasks, you will need to enable the logging for application starts/stops:
+1. Run secpol.msc (search with Windows search)
 2. Navigate to Local Policies/Audit Policy
 3. Double Click Audit process tracking and enable Success
-4. Now, if you start any application, if you look in Event Viewer / Security Log you will see a Process Creation event 4688 each time an application is started and 4689 for each application stop.    
+4. Now, each application start/stop will be logged in the event log
 
-Now start the Task Scheduler (taskschd.msc) and create your first task:
-1. On the "General" Tab, give the task a name (**SteamIdler**)
-2. On the "Triggers" tab, create a new trigger, and choose On an event as the trigger
-3. Choose Custom, and click New Event Filter
-4. Switch to the XML tab and tick "edit manually"
-5. Insert the following query: (note you may need to change the Steam path)
+### Task Creation  
+Now start the Task Scheduler (taskschd.msc) and create the four tasks:
+
+#### SteamIdler_1
+1. Right click, create new task
+2. On the "General" Tab, give the task a name (**SteamIdler_1**)
+3. Tick "Run with highest privileges"
+4. On the "Triggers" tab, create a new trigger, and choose "On an event" as the trigger
+5. Choose Custom, and click New Event Filter
+6. Switch to the XML tab and tick "edit manually"
+7. Insert the following query: (note you may need to change the Steam path)
 ```
 <QueryList>
   <Query Id="0" Path="Security">
@@ -69,13 +103,27 @@ Now start the Task Scheduler (taskschd.msc) and create your first task:
   </Query>
 </QueryList>
 ```
-6. Click "OK" two times
-7. On the "Action" tab create new action "run programm"
-8. Browse to the path and select *runASF.bat*
-9. Click "OK" two times
+7. Click "OK" two times
+8. On the "Action" tab create new action "run programm"
+9. Browse to the path and select *SteamIdler_1.bat*
+10. Click "OK" two times
+11. You may need to enter your Windows password
 
-Now you will need to create the second task to stop the process automatically (**SteamIdlerExit**).  
-All steps are the same except the Query in Step 5:
+#### SteamIdler_2
+1. Right click, create new task
+2. On the "General" Tab, give the task a name (**SteamIdler_2**)
+8. On the "Action" tab create new action "run programm"
+9. Browse to the path and select *SteamIdler_2.bat*
+10. Click "OK" two times
+    
+#### SteamIdlerExit
+1. Right click, create new task
+2. On the "General" Tab, give the task a name (**SteamIdlerExit**)
+3. Tick "Run with highest privileges"
+4. On the "Triggers" tab, create a new trigger, and choose "On an event" as the trigger
+5. Choose Custom, and click New Event Filter
+6. Switch to the XML tab and tick "edit manually"
+7. Insert the following query: (note you may need to change the Steam path)
 ```
 <QueryList>
   <Query Id="0" Path="Security">
@@ -87,18 +135,26 @@ All steps are the same except the Query in Step 5:
   </Query>
 </QueryList>
 ```
+7. Click "OK" two times
+8. On the "Action" tab create new action "run programm"
+9. Browse to the path and select *SteamIdlerExit.bat*
+10. Click "OK" two times
+11. You may need to enter your Windows password
 
-and the script in Step 8:  
---> *exitASF.bat*
-
-The last Task is really simple:
-1. On the "General" Tab, give the task a name (**SteamIdlerTaskEnableOnStart**)
-2. On the "Triggers" tab, create a new trigger, and choose "on login" for your specific user
-3. Click "OK"
-4. On the "Action" tab create new action "run programm"
-5. Browse to the path and select *exitASF.bat*
+#### SteamIdlerEnableOnStart
+1. Right click, create new task
+2. On the "General" Tab, give the task a name (**SteamIdlerEnableOnStart**)
+3. Tick "Run with highest privileges"
+4. On the "Triggers" tab, create a new trigger, and choose "On startup" as the trigger
+5. Click "OK"
+6. On the "Action" tab create new action "run programm"
+7. Browse to the path and select *SteamIdlerExit.bat*
+8. Click "OK" two times
+9. You may need to enter your Windows password
 
 ## Finished
-
 Now everytime you start Steam the ASF process will be started automatically in the background.
-And if you exit Steam completely the ASF process will be stopped.
+If you exit Steam, the ASF process will be stopped.
+
+## Uninstallation
+To disable all of this again, you just need to delete the four tasks.
